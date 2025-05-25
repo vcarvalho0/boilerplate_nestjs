@@ -20,10 +20,11 @@ model User {
   status           Status            @default(Pending)
   fileUrl          String?           @db.VarChar(1500)
   fileKey          String?           @db.VarChar(1500)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
   adminPermissions AdminPermission[]
   files            File[]
+  company          Company?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   @@map("users")
 }
@@ -60,9 +61,37 @@ model Text {
   @@map("texts")
 }
 
+model Company {
+  id           Int       @id @default(autoincrement())
+  name         String
+  cnpj         String
+  address      String
+  products     Product[]
+  companyOwner User      @relation(fields: [userId], references: [id])
+  userId       Int       @unique
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("companys")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal
+  company     Company  @relation(fields: [companyId], references: [id])
+  companyId   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("products")
+}
+
 enum Role {
   Master
   Admin
+  CompanyOwner
   User
 }
 
